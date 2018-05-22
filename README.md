@@ -1,1 +1,1 @@
-# argenticator-smart-contract
+# argenticator-backend
