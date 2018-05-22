@@ -1,0 +1,22 @@
+{
+  "name": "argenticator-smart-contract",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mezzab/argenticator-smart-contract.git"
+  },
+  "author": "mezzab",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mezzab/argenticator-smart-contract/issues"
+  },
+  "homepage": "https://github.com/mezzab/argenticator-smart-contract#readme",
+  "dependencies": {
+    "web3": "ethereum/web3.js"
+  }
+}
