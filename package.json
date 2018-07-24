@@ -2,9 +2,9 @@
   "name": "argenticator-smart-contract",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon server.js"
   },
   "repository": {
     "type": "git",
@@ -23,6 +23,6 @@
     "web3": "github:ethereum/web3.js"
   },
   "devDependencies": {
-    "nodemon": "^1.17.5"
+    "nodemon": "^1.11.0"
   }
 }
