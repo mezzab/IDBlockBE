@@ -1,32 +1,39 @@
 var nodemailer = require("nodemailer");
+var develop = require("../../config/develop");
+var utils = require("./utils");
+
 module.exports = function(app, db) {
   app.post("/sendEmail", (req, res) => {
-    //todo: generar un codigo automaticamente
     var transporter = nodemailer.createTransport({
-      service: "gmail",
+      service: develop.mail.service,
       auth: {
-        user: "idblocktest@gmail.com",
-        pass: "marcoszxc"
+        user: develop.mail.user,
+        pass: develop.mail.pass
       }
     });
 
-    var mailOptions = {
-      from: "idblocktest@gmail.com",
-      to: req.body.mail,
-      subject: "Tu código de verificación de IDBlock",
-      html:
-        "<p> Tu código de verificaciónes: <b>123123</b> <p>Este código caducará en 10 minutos.  </p> </p>"
-    };
+    var code = utils.randomCode();
 
-    transporter.sendMail(mailOptions, function(error, info) {
+    transporter.sendMail(utils.mailOptions(req.body.mail, code), function(
+      error,
+      info
+    ) {
       if (error) {
-        console.log(error);
+        console.log("Error sending mail: ", error);
       } else {
-        console.log("Email sent to" + req.body.mail + info.response);
+        console.log(
+          "Email sent to" +
+            req.body.mail +
+            ", with code:---" +
+            code +
+            "---.Extra info:" +
+            info.response
+        );
       }
     });
 
-    res.send({ code: "123123" });
+    res.send({ code });
+
     /* lo ideal seria guardar el codigo en una db con el mail
       y cuando el user presiona continuar abria que pegarle de nuevo al back con el codigo
       para que el verifique si es el que guardo en la db.*/
