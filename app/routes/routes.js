@@ -22,11 +22,11 @@ module.exports = function(app, db) {
         console.log("Error sending mail: ", error);
       } else {
         console.log(
-          "Email sent to" +
+          "Email sent to: " +
             req.body.mail +
-            ", with code:---" +
+            ". Verification code: *** " +
             code +
-            "---.Extra info:" +
+            " *** .Extra info:" +
             info.response
         );
       }
