@@ -15,7 +15,7 @@ module.exports = function(app, db) {
       to: req.body.mail,
       subject: "Tu código de verificación de IDBlock",
       html:
-        "<p> Tu codigo de verificacion es: <b>123123</b> <p>Este código caducará en 10 minutos.  </p> </p>"
+        "<p> Tu código de verificaciónes: <b>123123</b> <p>Este código caducará en 10 minutos.  </p> </p>"
     };
 
     transporter.sendMail(mailOptions, function(error, info) {
