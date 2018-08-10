@@ -42,4 +42,20 @@ module.exports = function(app, db) {
   app.post("/saveUserInSmartContract", (req, res) => {
     res.send("no implementamos esto todavia guacho");
   });
+
+  app.post("/sendSMS", (req, res) => {
+    console.log("***SMS***")
+    var accountSid = 'AC42a878de00f204d7a78f93ffaffbe634'; // Your Account SID from www.twilio.com/console
+    var authToken = 'c9b595de419ae8f43ccfe2030211928d';   // Your Auth Token from www.twilio.com/console
+
+    var twilio = require('twilio');
+    var client = new twilio(accountSid, authToken);
+
+    client.messages.create({
+    body: 'Hello from Node',
+    to: '+541158833086',  // Text this number
+    from: '+15866661838' // From a valid Twilio number
+    })
+   .then((message) => console.log(message.sid));
+  });
 };
