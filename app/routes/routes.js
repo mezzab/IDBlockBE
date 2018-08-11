@@ -45,17 +45,20 @@ module.exports = function(app, db) {
 
   app.post("/sendSMS", (req, res) => {
     console.log("***SMS***")
-    var accountSid = 'AC42a878de00f204d7a78f93ffaffbe634'; // Your Account SID from www.twilio.com/console
-    var authToken = 'c9b595de419ae8f43ccfe2030211928d';   // Your Auth Token from www.twilio.com/console
+    var accountSid = develop.sms.accountSid; // Your Account SID from www.twilio.com/console
+    var authToken = develop.sms.authToken;   // Your Auth Token from www.twilio.com/console
 
     var twilio = require('twilio');
     var client = new twilio(accountSid, authToken);
 
+    var code = utils.randomCode();
+
     client.messages.create({
-    body: 'Hello from Node',
-    to: '+541158833086',  // Text this number
+    body: 'Yor code is: *** ' + code,
+    to: "+54"+req.body.phone,  // Text this number
     from: '+15866661838' // From a valid Twilio number
     })
    .then((message) => console.log(message.sid));
+   res.send({ code });
   });
 };
