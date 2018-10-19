@@ -18,11 +18,13 @@
   "homepage": "https://github.com/mezzab/argenticator-smart-contract#readme",
   "dependencies": {
     "body-parser": "^1.18.3",
-    "express": "^4.16.3",
+    "express": "^4.16.4",
+    "fs": "0.0.1-security",
+    "ipfs-api": "^25.0.0",
     "mongodb": "^2.2.16",
     "nodemailer": "^4.6.7",
-    "web3": "github:ethereum/web3.js",
-    "twilio": "1.5.0"
+    "twilio": "1.5.0",
+    "web3": "github:ethereum/web3.js"
   },
   "devDependencies": {
     "nodemon": "^1.11.0"

@@ -61,4 +61,30 @@ module.exports = function(app, db) {
    .then((message) => console.log(message.sid));
    res.send({ code });
   });
+
+app.post("/saveIPFS", (req, res) => {
+    console.log("***IPFS***")
+
+	const ipfsAPI = require('ipfs-api');
+	const express = require('express');
+	const fs = require('fs');
+	const app = express();
+
+	const ipfs = ipfsAPI('ipfs.infura.io', '5001', {protocol: 'https'})
+
+	let testFile = fs.readFileSync("PromotoraEdit.js");
+	let testBuffer = new Buffer(testFile);
+
+	console.log("***IPF22222S***")
+
+    	ipfs.files.add(testBuffer, function (err, file) {
+       	 if (err) {
+       	   console.log(err);
+        }
+        console.log(file)
+     	})
+	
+	console.log("***END IPFS***")
+	
+  });
 };
