@@ -63,7 +63,9 @@ module.exports = function(app, db) {
 
 app.post("/saveIPFS", (req, res) => {
     console.log("***IPFS***")
-
+    console.log(req.body.legajo)
+	
+	
 	const ipfsAPI = require('ipfs-api');
 	const express = require('express');
 	const fs = require('fs');
@@ -71,8 +73,7 @@ app.post("/saveIPFS", (req, res) => {
 
 	const ipfs = ipfsAPI('ipfs.infura.io', '5001', {protocol: 'https'})
 
-	let testFile = fs.readFileSync("PromotoraEdit.js");
-	let testBuffer = new Buffer(testFile);
+	let testBuffer = new Buffer(req.body.legajo);
 
 	console.log("***IPF22222S***")
 
