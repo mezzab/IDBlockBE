@@ -44,7 +44,6 @@ module.exports = function(app, db) {
   });
 
   app.post("/sendSMS", (req, res) => {
-    console.log("***SMS***")
     var accountSid = develop.sms.accountSid; // Your Account SID from www.twilio.com/console
     var authToken = develop.sms.authToken;   // Your Auth Token from www.twilio.com/console
 
@@ -52,7 +51,7 @@ module.exports = function(app, db) {
     var client = new twilio(accountSid, authToken);
 
     var code = utils.randomCode();
-
+    console.log("SMS sent. " + ". Verification code: *** " + code + " *** .");
     client.messages.create({
     body: 'Yor code is: *** ' + code,
     to: "+54"+req.body.phone,  // Text this number
