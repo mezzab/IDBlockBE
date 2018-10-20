@@ -12,19 +12,26 @@ require("./app/routes")(app, {});
 app.listen(port, () => {
 console.log("We are live on " + port);
 
- 	//if (typeof web3 !== 'undefined') {
-  	//web3 = new Web3(web3.currentProvider);
-	//} else {
-  	//web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
-	//}
+ 	if (typeof web3 !== 'undefined') {
+  	web3 = new Web3(web3.currentProvider);
+	} else {
+  	web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+	}
 
-var Eth = require('web3-eth');
-var eth = new Eth(Eth.givenProvider || "http://localhost:8545");
-var Web3 = require('web3');
-var web3 = new Web3(Web3.givenProvider || "http://localhost:8545");
+//var Eth = require('web3-eth');
+//var eth = new Eth(Eth.givenProvider || "http://localhost:8545");
+//var Web3 = require('web3');
+//var web3 = new Web3(Web3.givenProvider || "http://localhost:8545");
 
-console.log("Las cuentas ganache son:");
-web3.eth.getAccounts(console.log);
+
+web3.eth.getAccounts(function(error, accounts) {
+ 	console.log("Las cuentas ganache son:");
+     	console.log(accounts);
+	web3.eth.defaultAccount = accounts[0];
+	console.log("La cuenta a utilizar sera:");
+	console.log(web3.eth.defaultAccount);
+    })
+
 });
 
 // MongoClient.connect(
