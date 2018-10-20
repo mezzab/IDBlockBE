@@ -24,7 +24,7 @@
     "mongodb": "^2.2.16",
     "nodemailer": "^4.6.7",
     "twilio": "1.5.0",
-    "web3": "github:ethereum/web3.js"
+    "web3": "^1.0.0-beta.36"
   },
   "devDependencies": {
     "nodemon": "^1.11.0"
