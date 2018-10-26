@@ -1,10 +1,11 @@
-var nodemailer = require ('nodemailer');
-var develop = require ('../../config/develop');
-var utils = require ('./utils');
+var nodemailer = require('nodemailer');
+var develop = require('../../config/develop');
+var utils = require('./utils');
 
 module.exports = function (app, db) {
-  app.post ('/sendEmail', (req, res) => {
-    var transporter = nodemailer.createTransport ({
+  app.post('/sendEmail', (req, res) => {
+    console.log('* * * * * *  EMAIL * * * * * * ');
+    var transporter = nodemailer.createTransport({
       service: develop.mail.service,
       auth: {
         user: develop.mail.user,
@@ -12,78 +13,77 @@ module.exports = function (app, db) {
       },
     });
 
-    var code = utils.randomCode ();
+    var code = utils.randomCode();
 
-    transporter.sendMail (utils.mailOptions (req.body.mail, code), function (
+    transporter.sendMail(utils.mailOptions(req.body.mail, code), function (
       error,
       info
     ) {
       if (error) {
-        console.log ('Error sending mail: ', error);
+        console.log('Error sending mail: ', error);
       } else {
-        console.log (
+        console.log(
           'Email sent to: ' +
-            req.body.mail +
-            '. Verification code: *** ' +
-            code +
-            ' *** .Extra info:' +
-            info.response
+          req.body.mail +
+          '. Verification code: *** ' +
+          code +
+          ' *** .Extra info:' +
+          info.response
         );
       }
     });
 
-    res.send ({code});
+    res.send({ code });
 
     /* lo ideal seria guardar el codigo en una db con el mail
       y cuando el user presiona continuar abria que pegarle de nuevo al back con el codigo
       para que el verifique si es el que guardo en la db.*/
   });
 
-  app.post ('/saveUserInSmartContract', (req, res) => {
-    res.send ('no implementamos esto todavia guacho');
+  app.post('/saveUserInSmartContract', (req, res) => {
+    console.log('* * * * * * SAVE USER IN SMART CONTRACT * * * * * * ');
+    res.send('no implementamos esto todavia guacho');
   });
 
-  app.post ('/sendSMS', (req, res) => {
+  app.post('/sendSMS', (req, res) => {
+    console.log('* * * * * *  SMS * * * * * * ');
     var accountSid = develop.sms.accountSid; // Your Account SID from www.twilio.com/console
     var authToken = develop.sms.authToken; // Your Auth Token from www.twilio.com/console
 
-    var twilio = require ('twilio');
-    var client = new twilio (accountSid, authToken);
+    var twilio = require('twilio');
+    var client = new twilio(accountSid, authToken);
 
-    var code = utils.randomCode ();
-    console.log ('SMS sent. ' + '. Verification code: *** ' + code + ' *** .');
+    var code = utils.randomCode();
+    console.log('SMS sent. ' + '. Verification code: *** ' + code + ' *** .');
     client.messages
-      .create ({
+      .create({
         body: 'Yor code is: *** ' + code,
         to: '+54' + req.body.phone, // Text this number
         from: '+15866661838', // From a valid Twilio number
       })
-      .then (message => console.log (message.sid));
-    res.send ({code});
+      .then(message => console.log('message.sid: ', message.sid));
+    res.send({ code });
   });
 
-  app.post ('/saveIPFS', (req, res) => {
-    console.log ('***IPFS***');
-    console.log (req.body.legajo);
+  app.post('/saveIPFS', (req, res) => {
+    console.log('* * * * * *  IPFS * * * * * * ');
+    console.log('req.body.legajo: ', req.body.legajo);
 
-    const ipfsAPI = require ('ipfs-api');
-    const express = require ('express');
-    const fs = require ('fs');
-    const app = express ();
+    const ipfsAPI = require('ipfs-api');
+    const express = require('express');
+    const fs = require('fs');
+    const app = express();
 
-    const ipfs = ipfsAPI ('ipfs.infura.io', '5001', {protocol: 'https'});
+    const ipfs = ipfsAPI('ipfs.infura.io', '5001', { protocol: 'https' });
 
-    let testBuffer = new Buffer (req.body.legajo);
+    let testBuffer = new Buffer(req.body.legajo);
 
-    console.log ('***IPF22222S***');
 
-    ipfs.files.add (testBuffer, function (err, file) {
+    ipfs.files.add(testBuffer, function (err, file) {
       if (err) {
-        console.log (err);
+        console.log('Error saving file: ', err);
       }
-      console.log (file);
+      console.log('File successfully saved: ', file);
     });
-
-    console.log ('***END IPFS***');
   });
 };
