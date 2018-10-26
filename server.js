@@ -34,37 +34,43 @@ app.listen(port, () => {
         console.log(' ')
     })
 
+    startSmartContract();
+
     // Blockchain Routes - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    app.get('/initSmartContract', (req, res) => {
-        console.log('> Building and deploying smart contract... ');
+    app.post('/initSmartContract', (req, res) => {
 
         startSmartContract()
             .then(() => {
                 res.send('EXITO');
             })
             .catch(err => {
-                res.send('ERROR: ', err);
+                res.send(err);
             });
     });
 
-    app.get('/voteRama', (req, res) => {
-        voteRama(0)
+    app.get('/getHash', (req, res) => {
+        const dni = req.query.dni;
+        if (!dni) return res.send('Es necesario un dni para realizar la consulta.')
+        getHash(dni)
             .then(() => {
-                res.send('EXITO');
+                res.send('EXITO!');
             })
             .catch(err => {
-                res.send('ERROR: ', err);
+                res.send('Error: ' + err);
             });
     });
 
-    app.get('/voteNick', (req, res) => {
-        voteNick(0)
+    app.post('/setHash', (req, res) => {
+        const dni = req.body.dni;
+        const hash = req.body.hash;
+        if (!dni || !hash) return res.send('Es necesario un dni y un hash para realizar la consulta.')
+        setHash(dni, hash)
             .then(() => {
-                res.send('EXITO');
+                res.send('EXITO!');
             })
             .catch(err => {
-                res.send('ERROR: ', err);
+                res.send('Error: ' + err);
             });
     });
 
@@ -73,95 +79,60 @@ app.listen(port, () => {
 let abi;
 let bytecode;
 let contractInstance;
-let rama;
-let nick;
-let jose;
+let accounts;
 
 async function startSmartContract() {
-    let accounts = await web3.eth.getAccounts();
+    console.log('> Building and deploying smart contract... ');
+    accounts = await web3.eth.getAccounts();
+    console.log("   Buscando smart contract IdentitiesBlock.sol...");
 
-    console.log("   Buscando smart contract Voting.sol.");
-
-    let helloPath = path.resolve(__dirname, 'contracts', 'Voting.sol');
+    let helloPath = path.resolve(__dirname, 'contracts', 'IdentitiesBlock.sol');
     let code = fs.readFileSync(helloPath, 'UTF-8').toString();
     let compiledCode = solc.compile(code, 1);
-    abi = JSON.parse(compiledCode.contracts[':Voting'].interface);
-    bytecode = compiledCode.contracts[':Voting'].bytecode;
-    console.log("   Compilando smart contrat.");
+    abi = JSON.parse(compiledCode.contracts[':IdentitiesBlock'].interface);
+    bytecode = compiledCode.contracts[':IdentitiesBlock'].bytecode;
 
-    let votingContract = new web3.eth.Contract(abi, { from: accounts[0], gas: 47000, data: bytecode });
+    let identitiesContract = new web3.eth.Contract(abi, { from: accounts[0], gas: 47000, data: bytecode });
 
-    rama = web3.utils.asciiToHex('Rama');
-    nick = web3.utils.asciiToHex('Nick');
-    jose = web3.utils.asciiToHex('Jose');
-    console.log("   Deployando smart contrat.");
-    contractInstance = await votingContract.deploy({
-        arguments: [[rama, nick, jose]]
-    })
+    console.log("   Deployando y deployando smart contrat...");
+    contractInstance = await identitiesContract.deploy()
         .send({
             from: accounts[0],
             gas: 1500000
         }, (err, txHash) => {
-            // console.log('send:', err, txHash);
+            console.log('send:', err, txHash);
         })
         .on('error', (err) => {
             console.log('error:', err);
         })
         .on('transactionHash', (err) => {
-            // console.log('transactionHash:', err);
+            console.log('transactionHash:', err);
         })
         .on('receipt', (receipt) => {
-            // console.log('receipt:', receipt);
-            votingContract.options.address = receipt.contractAddress;
+            console.log('receipt:', receipt);
+            identitiesContract.options.address = receipt.contractAddress;
         });
 
     // console.log('contractInstance.options:', contractInstance.options);
 
+    console.log("");
     console.log("✓ Completado!");
-    let ramaresult = await contractInstance.methods.totalVotesFor(rama).call({ from: accounts[0] });
-    let nickresult = await contractInstance.methods.totalVotesFor(nick).call({ from: accounts[0] });
-    let joseresult = await contractInstance.methods.totalVotesFor(jose).call({ from: accounts[0] });
-    console.log('> Datos del smart contract:')
-    console.log('   El resultado para rama es de :', ramaresult);
-    console.log('   El resultado para nick es de :', nickresult);
-    console.log('   El resultado para jose es de :', joseresult);
 }
 
-async function voteRama(n) {
-    let accounts = await web3.eth.getAccounts();
+async function getHash(dni) {
+    console.log('Buscando dni con varias accounts', dni)
+    let getHash0 = await contractInstance.methods.getHash(dni).call({ from: accounts[0] });
+    console.log('Pedido con cuenta 0:', getHash0);
 
-    let receipt = await contractInstance.methods.voteForCandidate(rama).send({ from: accounts[n] });
-    console.log('voteForCandidate receipt:', receipt);
+    let getHash1 = await contractInstance.methods.getHash(dni).call({ from: accounts[1] });
+    console.log('Pedido con cuenta 1 :', getHash1);
 
-    let ramaresult = await contractInstance.methods.totalVotesFor(rama).call({ from: accounts[0] });
-    let nickresult = await contractInstance.methods.totalVotesFor(nick).call({ from: accounts[0] });
-    let joseresult = await contractInstance.methods.totalVotesFor(jose).call({ from: accounts[0] });
-    console.log('El resultado para rama es de :', ramaresult);
-    console.log('El resultado para nick es de :', nickresult);
-    console.log('El resultado para jose es de :', joseresult);
+    let getHash5 = await contractInstance.methods.getHash(dni).call({ from: accounts[5] });
+    console.log('Pedido con cuenta 5 :', getHash5);
 }
 
-async function voteNick(n) {
-    let accounts = await web3.eth.getAccounts();
-
-    let receipt = await contractInstance.methods.voteForCandidate(nick).send({ from: accounts[n] });
-    console.log('voteForCandidate receipt:', receipt);
-
-    let ramaresult = await contractInstance.methods.totalVotesFor(rama).call({ from: accounts[0] });
-    let nickresult = await contractInstance.methods.totalVotesFor(nick).call({ from: accounts[0] });
-    let joseresult = await contractInstance.methods.totalVotesFor(jose).call({ from: accounts[0] });
-    console.log('El resultado para rama es de :', ramaresult);
-    console.log('El resultado para nick es de :', nickresult);
-    console.log('El resultado para jose es de :', joseresult);
+async function setHash(dni, hash) {
+    console.log('Guardando dni', dni, 'con hash', hash, '.De cuenta', accounts[0])
+    let res = await contractInstance.methods.getHash(dni).call({ from: accounts[0] });
+    console.log('Respuesta:', res);
 }
-
-// MongoClient.connect(
-//   db.url,
-//   (err, database) => {
-//     if (err) return console.log(err);
-//     require("./app/routes")(app, database);
-//     app.listen(port, () => {
-//       console.log("We are live on " + port);
-//     });
-//   }
-// );
