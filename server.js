@@ -53,11 +53,13 @@ app.listen(port, () => {
         const dni = req.query.dni;
         if (!dni) return res.send('Es necesario un dni para realizar la consulta.')
         getHash(dni)
-            .then(() => {
-                res.send('EXITO!');
+            .then((hash) => {
+                console.log("✓ Exito! El hash es: ", hash);
+                res.send(hash);
             })
             .catch(err => {
-                res.send('Error: ' + err);
+                console.log("Error: No es posible acceder al hash.");
+                res.send('Error: No es posible acceder al hash. Details -->' + err);
             });
     });
 
@@ -67,10 +69,11 @@ app.listen(port, () => {
         if (!dni || !hash) return res.send('Es necesario un dni y un hash para realizar la consulta.')
         setHash(dni, hash)
             .then(() => {
+                console.log("✓ Exito! Se guardo el hash y se genero la relacion correctamente");
                 res.send('EXITO!');
             })
             .catch(err => {
-                res.send('Error: ' + err);
+                res.send({ msg: 'Error: No es posible acceder al hash.', err });
             });
     });
 
@@ -82,6 +85,7 @@ let contractInstance;
 let accounts;
 
 async function startSmartContract() {
+    console.log(' ')
     console.log('> Building and deploying smart contract... ');
     accounts = await web3.eth.getAccounts();
     console.log("   Buscando smart contract IdentitiesBlock.sol...");
@@ -120,19 +124,18 @@ async function startSmartContract() {
 }
 
 async function getHash(dni) {
-    console.log('Buscando dni con varias accounts', dni)
-    let getHash0 = await contractInstance.methods.getHash(dni).call({ from: accounts[0] });
-    console.log('Pedido con cuenta 0:', getHash0);
-
-    let getHash1 = await contractInstance.methods.getHash(dni).call({ from: accounts[1] });
-    console.log('Pedido con cuenta 1 :', getHash1);
-
-    let getHash5 = await contractInstance.methods.getHash(dni).call({ from: accounts[5] });
-    console.log('Pedido con cuenta 5 :', getHash5);
+    console.log(' ')
+    console.log(' ')
+    console.log('Buscando dni ' + dni + '...')
+    return await contractInstance.methods.getHash(dni).call({ from: accounts[2] });
 }
 
-async function setHash(dni, hash) {
-    console.log('Guardando dni', dni, 'con hash', hash, '.De cuenta', accounts[0])
-    let res = await contractInstance.methods.getHash(dni).call({ from: accounts[0] });
-    console.log('Respuesta:', res);
+async function setHash(dni, hash, entityAccount = accounts[2]) {
+    console.log(' ')
+    console.log(' ')
+    console.log('Guardando:')
+    console.log('   Dni:', dni)
+    console.log('   Hash:', hash)
+    console.log('   Cuenta:', entityAccount)
+    return await contractInstance.methods.setHash(dni, hash).send({ from: entityAccount, gas: 150000 });
 }
