@@ -51,15 +51,17 @@ app.listen(port, () => {
 
     app.get('/getHash', (req, res) => {
         const dni = req.query.dni;
+        const addr = req.query.addr;
+        const entityAddress = addr ? addr : accounts[5];
         if (!dni) return res.send('Es necesario un dni para realizar la consulta.')
-        getHash(dni)
+        getHash(dni, entityAddress)
             .then((hash) => {
                 console.log("✓ Exito! El hash es: ", hash);
                 res.send(hash);
             })
             .catch(err => {
                 console.log("Error: No es posible acceder al hash.");
-                res.send('Error: No es posible acceder al hash. Details -->' + err);
+                res.send({ msg: 'Error: No es posible acceder al hash.', err })
             });
     });
 
@@ -69,11 +71,29 @@ app.listen(port, () => {
         if (!dni || !hash) return res.send('Es necesario un dni y un hash para realizar la consulta.')
         setHash(dni, hash)
             .then(() => {
-                console.log("✓ Exito! Se guardo el hash y se genero la relacion correctamente");
-                res.send('EXITO!');
+                const msg = '✓ Exito! Se guardo el hash en el SC.';
+                console.log(msg);
+                res.send(msg);
             })
             .catch(err => {
-                res.send({ msg: 'Error: No es posible acceder al hash.', err });
+                res.send({ msg: 'Error: No es posible guardar el hash en el contrato.', err });
+            });
+    });
+
+    app.post('/setRelation', (req, res) => {
+        const dni = req.body.dni;
+        const addr = req.body.addr;
+        const entityAddress = addr ? addr : accounts[5];
+        // if (!dni || !addr) return res.send('Es necesario un dni y un addr para realizar la consulta.')
+        // setRelation(dni, addr)
+        setRelation(dni, entityAddress)
+            .then(() => {
+                const msg = '✓ Exito! Se genero la relacion en el SC.';
+                console.log(msg);
+                res.send(msg);
+            })
+            .catch(err => {
+                res.send({ msg: 'Error: No es posible crear la relacion dni/entityAddress.', err });
             });
     });
 
@@ -123,19 +143,31 @@ async function startSmartContract() {
     console.log("✓ Completado!");
 }
 
-async function getHash(dni) {
+// Recibe un dni y un address de la entidad que quiere conocer el hash.
+async function getHash(dni, entityAddr) {
     console.log(' ')
     console.log(' ')
-    console.log('Buscando dni ' + dni + '...')
-    return await contractInstance.methods.getHash(dni).call({ from: accounts[2] });
+    console.log('La entidad de address: ', entityAddr)
+    console.log('Busca el hash de ' + dni + '...')
+    return await contractInstance.methods.getHash(dni).call({ from: entityAddr });
 }
 
-async function setHash(dni, hash, entityAccount = accounts[2]) {
+// Recibe el dni del usuario y el hash a IPFS donde esta almacenado el legajo con la informacion. 
+async function setHash(dni, hash) {
     console.log(' ')
-    console.log(' ')
-    console.log('Guardando:')
+    console.log('> SetHash ')
+    console.log('Guardando el hash:')
     console.log('   Dni:', dni)
     console.log('   Hash:', hash)
-    console.log('   Cuenta:', entityAccount)
-    return await contractInstance.methods.setHash(dni, hash).send({ from: entityAccount, gas: 150000 });
+    return await contractInstance.methods.setHash(dni, hash).send({ from: accounts[0], gas: 150000 });
+}
+
+// Recibe el dni del usuario y el address de la entidad para generar la relacion en la whitelist
+async function setRelation(dni, entityAddr) {
+    console.log(' ')
+    console.log('> SetRelation ')
+    console.log('Guardando relacion:')
+    console.log('   Dni:', dni)
+    console.log('   Cuenta:', entityAddr)
+    return await contractInstance.methods.setRelation(dni, entityAddr).send({ from: accounts[0], gas: 150000 });
 }
