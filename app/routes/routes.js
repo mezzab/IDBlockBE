@@ -67,23 +67,23 @@ module.exports = function (app, db) {
 
   app.post('/saveIPFS', (req, res) => {
     console.log('* * * * * *  IPFS * * * * * * ');
-    console.log('req.body.legajo: ', req.body.legajo);
+    console.log('el legajo que se guardara es: ', req.body.legajo);
 
     const ipfsAPI = require('ipfs-api');
-    const express = require('express');
-    const fs = require('fs');
-    const app = express();
 
     const ipfs = ipfsAPI('ipfs.infura.io', '5001', { protocol: 'https' });
 
     let testBuffer = new Buffer(req.body.legajo);
 
 
-    ipfs.files.add(testBuffer, function (err, file) {
+    return ipfs.files.add(testBuffer, function (err, file) {
       if (err) {
         console.log('Error saving file: ', err);
+        res.send(err)
       }
-      console.log('File successfully saved: ', file);
+      console.log('> File successfully saved ✓ ');
+      console.log(file)
+      res.send(file)
     });
   });
 };
