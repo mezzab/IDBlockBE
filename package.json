@@ -1,5 +1,5 @@
 {
-  "name": "argenticator-smart-contract",
+  "name": "idblockbackend",
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mezzab/argenticator-smart-contract.git"
+    "url": "git+https://github.com/mezzab/IDBlockBE.git"
   },
   "author": "mezzab",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/mezzab/argenticator-smart-contract/issues"
+    "url": "https://github.com/mezzab/IDBlockBE/issues"
   },
-  "homepage": "https://github.com/mezzab/argenticator-smart-contract#readme",
+  "homepage": "https://github.com/mezzab/IDBlockBE#readme",
   "dependencies": {
     "body-parser": "^1.18.3",
     "express": "^4.16.4",
